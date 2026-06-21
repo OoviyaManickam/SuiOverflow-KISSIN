@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { DebateTranscript } from "@/types";
@@ -10,6 +11,7 @@ const PACKAGE_ID = process.env.NEXT_PUBLIC_KISSIN_PACKAGE_ID;
 const CLOCK = "0x0000000000000000000000000000000000000000000000000000000000000006";
 
 export function DebateArena({ transcript: initial }: { transcript: DebateTranscript }) {
+  const router = useRouter();
   const [transcript, setTranscript] = useState(initial);
   const [minting, setMinting] = useState(false);
   const [mintError, setMintError] = useState<string | null>(null);
@@ -23,7 +25,6 @@ export function DebateArena({ transcript: initial }: { transcript: DebateTranscr
       const address = typeof window !== "undefined" ? localStorage.getItem("kissin_address") : null;
       if (!address) throw new Error("No wallet connected");
 
-      // Store on Walrus first if not already stored
       let blobId = transcript.walrusBlobId;
       if (!blobId) {
         const res = await fetch("/api/mint", {
@@ -53,6 +54,7 @@ export function DebateArena({ transcript: initial }: { transcript: DebateTranscr
         ?.effects?.created?.[0]?.reference?.objectId;
 
       setTranscript((t) => ({ ...t, walrusBlobId: blobId, suiCapsuleId: capsuleId || result.digest }));
+      setTimeout(() => router.push("/capsules"), 1500);
     } catch (err) {
       setMintError(err instanceof Error ? err.message : "Mint failed");
     } finally {
@@ -112,10 +114,11 @@ export function DebateArena({ transcript: initial }: { transcript: DebateTranscr
         )}
 
         {transcript.suiCapsuleId && (
-          <div className="mt-4 text-center">
-            <span className="text-teal-400 text-xs font-mono">
+          <div className="mt-4 text-center space-y-2">
+            <p className="text-teal-400 text-xs font-mono">
               Capsule minted: {transcript.suiCapsuleId.slice(0, 8)}...{transcript.suiCapsuleId.slice(-4)}
-            </span>
+            </p>
+            <p className="text-gray-600 text-xs">Redirecting to your capsules...</p>
           </div>
         )}
       </div>

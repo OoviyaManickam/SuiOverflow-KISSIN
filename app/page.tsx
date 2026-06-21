@@ -1,107 +1,33 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import "@mysten/dapp-kit/dist/index.css";
-import { DebateArena } from "@/components/DebateArena";
-import { DebateTranscript, UserProfile } from "@/types";
-import Link from "next/link";
 
-export default function Home() {
+export default function Landing() {
   const router = useRouter();
   const account = useCurrentAccount();
-  const [transcript, setTranscript] = useState<DebateTranscript | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const profile = localStorage.getItem("kissin_profile");
-    if (!profile) { router.push("/onboarding"); return; }
-
-    const address = account?.address || localStorage.getItem("kissin_address");
-    if (!address) { router.push("/onboarding"); return; }
-
-    if (account?.address) localStorage.setItem("kissin_address", account.address);
-
-    loadTodaysBrief(address);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account?.address]);
-
-  async function loadTodaysBrief(addr: string) {
-    const cached = localStorage.getItem("kissin_today");
-    if (cached) {
-      const { transcript: t, date } = JSON.parse(cached);
-      if (new Date(date).toDateString() === new Date().toDateString()) {
-        setTranscript(t);
-        return;
+    if (account?.address) {
+      localStorage.setItem("kissin_address", account.address);
+      const profile = localStorage.getItem("kissin_profile");
+      if (profile) {
+        router.push("/debate");
+      } else {
+        router.push("/onboarding");
       }
     }
-    await runPipeline(addr);
-  }
-
-  async function runPipeline(addr: string) {
-    setLoading(true);
-    setError(null);
-    try {
-      const profileRaw = localStorage.getItem("kissin_profile");
-      const user: UserProfile = profileRaw
-        ? JSON.parse(profileRaw)
-        : { address: addr, level: "builder", topics: ["llms"], createdAt: Date.now() };
-      const res = await fetch("/api/pipeline", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setTranscript(data.transcript);
-      localStorage.setItem("kissin_today", JSON.stringify({ transcript: data.transcript, date: new Date().toISOString() }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to run pipeline");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const address = account?.address || (typeof window !== "undefined" ? localStorage.getItem("kissin_address") : null);
+  }, [account?.address, router]);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-black tracking-tighter">KISSIN</h1>
-          <p className="text-gray-500 text-xs">Keep It Simple or I&apos;ll go INSane</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/history" className="text-gray-500 text-xs hover:text-white transition">History</Link>
-          <ConnectButton />
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="text-center space-y-4 mb-12">
+        <h1 className="text-6xl font-black tracking-tighter">KISSIN</h1>
+        <p className="text-gray-400 text-lg">Keep It Simple or I&apos;ll go INSane</p>
+        <p className="text-gray-600 text-sm">AI news signal detector powered by Walrus + Sui</p>
       </div>
-
-      {loading && (
-        <div className="text-center py-20">
-          <div className="text-teal-400 text-sm mb-2 animate-pulse">Running agents...</div>
-          <p className="text-gray-600 text-xs">Hype vs Skeptic debate in progress</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 text-center">
-          <p className="text-red-400 text-sm mb-3">{error}</p>
-          <button
-            onClick={() => address && runPipeline(address)}
-            className="text-xs text-red-400 border border-red-800 px-4 py-2 rounded-full hover:bg-red-900/30"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-
-      {transcript && !loading && <DebateArena transcript={transcript} />}
-
-      {!transcript && !loading && !error && (
-        <div className="text-center py-20 text-gray-600 text-sm">Loading today&apos;s brief...</div>
-      )}
+      <ConnectButton />
     </div>
   );
 }
