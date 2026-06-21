@@ -3,9 +3,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
+import dynamic from "next/dynamic";
 import { DebateTranscript } from "@/types";
 import { VerdictCard } from "./VerdictCard";
 import { WalrusProof } from "./WalrusProof";
+
+const Ferrofluid = dynamic(() => import("@/components/Ferrofluid"), { ssr: false });
 
 const PACKAGE_ID = process.env.NEXT_PUBLIC_KISSIN_PACKAGE_ID;
 const CLOCK = "0x0000000000000000000000000000000000000000000000000000000000000006";
@@ -74,25 +77,63 @@ export function DebateArena({ transcript: initial }: { transcript: DebateTranscr
       </div>
 
       <div className="grid grid-cols-2">
-        <div className="p-5 border-r border-gray-800 bg-red-500/5">
-          <p className="text-red-400 text-xs font-bold tracking-widest mb-3">HYPE</p>
-          <p className="text-gray-300 text-sm leading-relaxed">{transcript.hypeArgument.argument}</p>
-          <div className="mt-4">
-            <div className="h-1 bg-gray-800 rounded">
-              <div className="h-1 bg-red-500 rounded transition-all" style={{ width: `${transcript.hypeArgument.conviction}%` }} />
+        {/* HYPE — teal fluid */}
+        <div className="relative border-r border-gray-800 overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Ferrofluid
+              colors={["#2dd4bf", "#0d9488", "#134e4a"]}
+              speed={0.25}
+              scale={1.8}
+              turbulence={0.7}
+              fluidity={0.1}
+              rimWidth={0.2}
+              sharpness={2.5}
+              shimmer={1.2}
+              glow={2}
+              flowDirection="down"
+              opacity={0.18}
+              mouseInteraction={false}
+            />
+          </div>
+          <div className="relative z-10 p-5">
+            <p className="text-teal-400 text-xs font-bold tracking-widest mb-3">HYPE</p>
+            <p className="text-gray-300 text-sm leading-relaxed">{transcript.hypeArgument.argument}</p>
+            <div className="mt-4">
+              <div className="h-1 bg-gray-800 rounded">
+                <div className="h-1 bg-teal-400 rounded transition-all" style={{ width: `${transcript.hypeArgument.conviction}%` }} />
+              </div>
+              <p className="text-teal-400 text-xs mt-1">{transcript.hypeArgument.conviction}% conviction</p>
             </div>
-            <p className="text-red-400 text-xs mt-1">{transcript.hypeArgument.conviction}% conviction</p>
           </div>
         </div>
 
-        <div className="p-5 bg-purple-500/5">
-          <p className="text-purple-400 text-xs font-bold tracking-widest mb-3">SKEPTIC</p>
-          <p className="text-gray-300 text-sm leading-relaxed">{transcript.skepticArgument.argument}</p>
-          <div className="mt-4">
-            <div className="h-1 bg-gray-800 rounded">
-              <div className="h-1 bg-purple-500 rounded transition-all" style={{ width: `${transcript.skepticArgument.conviction}%` }} />
+        {/* SKEPTIC — red fluid */}
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Ferrofluid
+              colors={["#f43f5e", "#9f1239", "#4c0519"]}
+              speed={0.25}
+              scale={1.8}
+              turbulence={0.7}
+              fluidity={0.1}
+              rimWidth={0.2}
+              sharpness={2.5}
+              shimmer={1.2}
+              glow={2}
+              flowDirection="up"
+              opacity={0.18}
+              mouseInteraction={false}
+            />
+          </div>
+          <div className="relative z-10 p-5">
+            <p className="text-rose-400 text-xs font-bold tracking-widest mb-3">SKEPTIC</p>
+            <p className="text-gray-300 text-sm leading-relaxed">{transcript.skepticArgument.argument}</p>
+            <div className="mt-4">
+              <div className="h-1 bg-gray-800 rounded">
+                <div className="h-1 bg-rose-500 rounded transition-all" style={{ width: `${transcript.skepticArgument.conviction}%` }} />
+              </div>
+              <p className="text-rose-400 text-xs mt-1">{transcript.skepticArgument.conviction}% conviction</p>
             </div>
-            <p className="text-purple-400 text-xs mt-1">{transcript.skepticArgument.conviction}% conviction</p>
           </div>
         </div>
       </div>
