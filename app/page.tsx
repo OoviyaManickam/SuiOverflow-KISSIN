@@ -51,7 +51,6 @@ export default function Landing() {
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
         <div className="text-center space-y-3 mb-12">
-          <div className="text-8xl">💋</div>
           <h1 className="text-8xl font-black tracking-tighter">KISSIN</h1>
           <p className="text-gray-400 text-lg">Keep It Simple or I&apos;ll go INSane</p>
           <p className="text-gray-500 text-sm">AI news signal detector powered by Walrus + Sui</p>
