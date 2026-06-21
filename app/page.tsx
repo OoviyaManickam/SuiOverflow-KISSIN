@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import "@mysten/dapp-kit/dist/index.css";
@@ -7,16 +7,23 @@ import "@mysten/dapp-kit/dist/index.css";
 export default function Landing() {
   const router = useRouter();
   const account = useCurrentAccount();
+  const clearedRef = useRef(false);
 
+  // Clear session whenever we land on this page (disconnect/reconnect = fresh start)
+  useEffect(() => {
+    if (!clearedRef.current) {
+      clearedRef.current = true;
+      localStorage.removeItem("kissin_profile");
+      localStorage.removeItem("kissin_today");
+      localStorage.removeItem("kissin_address");
+    }
+  }, []);
+
+  // Once wallet connects, go to preferences — always
   useEffect(() => {
     if (account?.address) {
       localStorage.setItem("kissin_address", account.address);
-      const profile = localStorage.getItem("kissin_profile");
-      if (profile) {
-        router.push("/debate");
-      } else {
-        router.push("/onboarding");
-      }
+      router.push("/onboarding");
     }
   }, [account?.address, router]);
 

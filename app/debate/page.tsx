@@ -25,14 +25,6 @@ export default function Debate() {
   }, []);
 
   async function loadTodaysBrief(addr: string) {
-    const cached = localStorage.getItem("kissin_today");
-    if (cached) {
-      const { transcript: t, date } = JSON.parse(cached);
-      if (new Date(date).toDateString() === new Date().toDateString()) {
-        setTranscript(t);
-        return;
-      }
-    }
     await runPipeline(addr);
   }
 
@@ -52,7 +44,6 @@ export default function Debate() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setTranscript(data.transcript);
-      localStorage.setItem("kissin_today", JSON.stringify({ transcript: data.transcript, date: new Date().toISOString() }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run pipeline");
     } finally {
