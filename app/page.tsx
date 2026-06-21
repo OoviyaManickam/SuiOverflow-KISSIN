@@ -32,7 +32,7 @@ export default function Landing() {
     <div className="min-h-screen relative bg-black">
       <div className="absolute inset-0 z-0">
         <Ferrofluid
-          colors={["#2dd4bf", "#0d9488", "#134e4a"]}
+          colors={["#2dd4bf", "#f43f5e", "#0d9488", "#881337", "#134e4a"]}
           speed={0.3}
           scale={1.6}
           turbulence={0.8}
@@ -51,7 +51,7 @@ export default function Landing() {
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
         <div className="text-center space-y-4 mb-12">
-          <h1 className="text-6xl font-black tracking-tighter">KISSIN</h1>
+          <h1 className="text-8xl font-black tracking-tighter">💋 KISSIN</h1>
           <p className="text-gray-400 text-lg">Keep It Simple or I&apos;ll go INSane</p>
           <p className="text-gray-500 text-sm">AI news signal detector powered by Walrus + Sui</p>
         </div>
