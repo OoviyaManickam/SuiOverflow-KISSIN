@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KISSIN Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+
+  .diagram {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── Nodes ── */
+  .node {
+    border-radius: 12px;
+    padding: 14px 28px;
+    text-align: center;
+    position: relative;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .node.show { opacity: 1; transform: translateY(0); }
+
+  .node-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .node-title {
+    font-size: 16px;
+    font-weight: 800;
+  }
+  .node-sub {
+    font-size: 11px;
+    margin-top: 3px;
+    opacity: 0.6;
+  }
+
+  /* colors */
+  .news   { background: #0f172a; border: 1px solid #334155; color: #94a3b8; }
+  .news .node-title { color: #e2e8f0; }
+
+  .hype   { background: #042f2e; border: 1px solid #2dd4bf; color: #5eead4; }
+  .hype .node-title { color: #2dd4bf; }
+
+  .skeptic { background: #2d0714; border: 1px solid #f43f5e; color: #fb7185; }
+  .skeptic .node-title { color: #f43f5e; }
+
+  .validator { background: #1a1400; border: 1px solid #facc15; color: #fde047; }
+  .validator .node-title { color: #facc15; }
+
+  .verdict { background: #0f0f0f; border: 1px solid #a855f7; color: #c084fc; }
+  .verdict .node-title { color: #a855f7; }
+
+  /* ── Arrows ── */
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    position: relative;
+  }
+  .arrow.show { opacity: 1; }
+
+  .arrow-line {
+    width: 2px;
+    height: 100%;
+    background: #333;
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #333;
+  }
+
+  /* ── Split row ── */
+  .split-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+    position: relative;
+  }
+
+  .split-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+
+  /* horizontal connector line between the two branches */
+  .h-connector {
+    position: absolute;
+    top: 0;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: #333;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .h-connector.show { opacity: 1; }
+
+  /* ── Merge arrows ── */
+  .merge-row {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+    position: relative;
+  }
+
+  .merge-line {
+    flex: 1;
+    height: 36px;
+    position: relative;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .merge-line.show { opacity: 1; }
+
+  /* left branch curves down-right */
+  .merge-left::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; right: 0; bottom: 50%;
+    border-bottom: 2px solid #333;
+    border-right: 2px solid #333;
+    border-bottom-right-radius: 12px;
+  }
+  /* right branch curves down-left */
+  .merge-right::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 50%; left: 0; bottom: 50%;
+    border-bottom: 2px solid #333;
+    border-left: 2px solid #333;
+    border-bottom-left-radius: 12px;
+  }
+  /* center drop */
+  .merge-center {
+    width: 2px;
+    background: #333;
+    height: 36px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .merge-center.show { opacity: 1; }
+  .merge-center::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #333;
+  }
+  .merge-center { position: relative; }
+
+  /* ── User profile pill ── */
+  .profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 8px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .profile-pill.show { opacity: 1; }
+  .profile-pill span { color: #a855f7; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="diagram">
+
+  <!-- News -->
+  <div class="node news" id="n-news">
+    <div class="node-label">Input</div>
+    <div class="node-title">Breaking AI Story</div>
+    <div class="node-sub">fetched from live sources</div>
+  </div>
+
+  <!-- Arrow down to split -->
+  <div class="arrow" id="a1"><div class="arrow-line"></div></div>
+
+  <!-- Horizontal connector -->
+  <div class="split-row">
+    <div class="h-connector" id="h-conn"></div>
+    <div class="split-col">
+      <!-- Arrow down-left -->
+      <div class="arrow" id="a-left"><div class="arrow-line"></div></div>
+      <div class="node hype" id="n-hype">
+        <div class="node-label">Agent 1</div>
+        <div class="node-title">Hype</div>
+        <div class="node-sub">argues the bull case</div>
+      </div>
+    </div>
+    <div class="split-col">
+      <!-- Arrow down-right -->
+      <div class="arrow" id="a-right"><div class="arrow-line"></div></div>
+      <div class="node skeptic" id="n-skeptic">
+        <div class="node-label">Agent 2</div>
+        <div class="node-title">Skeptic</div>
+        <div class="node-sub">argues the opposite</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Merge lines -->
+  <div class="merge-row">
+    <div class="merge-line merge-left" id="m-left"></div>
+    <div class="merge-center" id="m-center"></div>
+    <div class="merge-line merge-right" id="m-right"></div>
+  </div>
+
+  <!-- User profile context -->
+  <div class="profile-pill" id="n-profile">
+    ✦ <span>Your Profile</span> — topics · level · history
+  </div>
+
+  <!-- Validator -->
+  <div class="node validator" id="n-validator">
+    <div class="node-label">Agent 3</div>
+    <div class="node-title">Validator</div>
+    <div class="node-sub">reads both · applies your lens</div>
+  </div>
+
+  <!-- Arrow to verdict -->
+  <div class="arrow" id="a2"><div class="arrow-line"></div></div>
+
+  <!-- Verdict -->
+  <div class="node verdict" id="n-verdict">
+    <div class="node-label">Output</div>
+    <div class="node-title">Your Verdict</div>
+    <div class="node-sub">unbiased · personalised · on-chain</div>
+  </div>
+
+</div>
+
+<script>
+  function show(id, delay) {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('show');
+    }, delay);
+  }
+
+  // Cascade in order
+  show('n-news',      300);
+  show('a1',          900);
+  show('h-conn',      1400);
+  show('a-left',      1400);
+  show('a-right',     1400);
+  show('n-hype',      1700);
+  show('n-skeptic',   1700);
+  show('m-left',      2400);
+  show('m-right',     2400);
+  show('m-center',    2400);
+  show('n-profile',   2700);
+  show('n-validator', 2900);
+  show('a2',          3500);
+  show('n-verdict',   3800);
+</script>
+</body>
+</html>
